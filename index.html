@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>X投稿テンプレート</title>
+  <style>
+    :root{--red:#d90020;--pink:#fff1f3;--line:#f3b4bd;--black:#171717;--gray:#f6f6f6}
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;font-family:"Meiryo UI","Meiryo",sans-serif;color:var(--black);background:#fafafa}
+    .wrap{max-width:760px;margin:auto;padding:18px 14px 70px}
+    header{background:#fff;border-bottom:4px solid var(--red);padding:8px 0 18px}
+    h1{margin:0;color:var(--red);font-size:28px} .sub{margin:7px 0 0;font-size:13px}
+    .nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0}
+    .nav a{display:flex;align-items:center;justify-content:center;min-height:46px;text-decoration:none;color:#111;border:1.5px solid var(--red);border-radius:12px;background:#fff;font-weight:700;font-size:14px;text-align:center;padding:7px}
+    .nav a:hover{background:var(--pink)}
+    .card{scroll-margin-top:10px;background:#fff;border:1px solid #eee;border-radius:16px;margin:16px 0;padding:15px;box-shadow:0 3px 12px #0000000a}
+    .card h2{font-size:20px;margin:0 -15px 14px;padding:10px 15px;background:var(--pink);border-left:5px solid var(--red)}
+    label{display:block;font-weight:700;font-size:13px;margin:11px 0 5px}
+    input,textarea{width:100%;border:1px solid #bbb;border-radius:9px;padding:11px;font:inherit;background:#fff}
+    textarea{min-height:76px;resize:vertical}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .preview{white-space:pre-wrap;background:var(--gray);border-radius:10px;padding:13px;margin-top:13px;font-size:14px;line-height:1.65;overflow-wrap:anywhere}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+    button,.xbtn{border:0;border-radius:10px;min-height:44px;padding:9px 10px;font:inherit;font-weight:700;cursor:pointer;text-align:center}
+    .xbtn{background:var(--red);color:#fff;grid-column:1/-1}
+    .copy{background:#111;color:#fff}.clear{background:#fff;color:#111;border:1px solid #aaa}
+    .note{font-size:12px;color:#666;margin:7px 0}.wide{grid-column:1/-1}
+    footer{text-align:right;font-size:11px;color:#666;margin-top:24px}
+    @media(max-width:430px){h1{font-size:24px}.wrap{padding-left:10px;padding-right:10px}.card{padding:13px}.card h2{margin-left:-13px;margin-right:-13px}.grid{grid-template-columns:1fr}.wide{grid-column:auto}}
+  </style>
+</head>
+<body>
+<header><div class="wrap" style="padding-bottom:0">
+  <h1>X 投稿テンプレート</h1>
+  <p class="sub">必要な項目を入力 → 完成文を確認 → Xで投稿 / コピー</p>
+  <nav class="nav" id="nav"></nav>
+</div></header>
+<main class="wrap"><div id="cards"></div><footer>スマホ向けテンプレートツール</footer></main>
+<script>
+const pad=n=>String(n).padStart(2,"0");
+const now=()=>new Date();
+const ymd=(d,slashPad=true)=> slashPad ? `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}` : `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+const md=d=>`${d.getMonth()+1}/${d.getDate()}`;
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const tomorrow=()=>ymd(addDays(now(),1));
+function nextWeek(){
+  const d=now(), day=d.getDay(), daysToMon=day===0?1:8-day;
+  const mon=addDays(d,daysToMon), sun=addDays(mon,6);
+  return `${ymd(mon,false)}～${ymd(sun,false)}`;
+}
+function monthRange(){
+ const d=now(), last=new Date(d.getFullYear(),d.getMonth()+1,0);
+ return `${d.getFullYear()}/${d.getMonth()+1}/1～${d.getFullYear()}/${d.getMonth()+1}/${last.getDate()}`;
+}
+const H=`#元木湧\n#ジュニア`;
+
+const templates=[
+{id:"instagram",title:"Instagram",fields:[["url","URL","url"]],build:v=>`${ymd(now())}\n\n【Instagram】\n\nジュニア公式\n\n${H}\n\n${v.url||""}`},
+{id:"blog",title:"ブログ",fields:[["num","ブログ更新 #","text"],["url","URL","url"]],build:v=>`${ymd(now())}\n\n【FAMILY CLUB web】\n\nブログ更新　#${v.num||""}\n\n#元木湧\n#ジュニア\n#元木湧のブログ\n\n${v.url||""}`},
+{id:"tiktok",title:"TikTok",fields:[["url","URL","url"]],build:v=>`${ymd(now())}\n\n【Tiktok】\n\nジュニア公式\n\n${H}\n\n${v.url||""}`},
+{id:"tver",title:"TVer",fields:[["limit","見逃し期限","text"],["url","URL","url"]],build:v=>`${ymd(now())}\n\n【Tver】\n\n⚠️見逃し期限 ～${v.limit||"　"}まで\n\n${H}\n#Tver\n\n${v.url||""}`},
+{id:"radiko",title:"Radiko",fields:[["limit","無料プラン見逃し期限","text"],["url","URL","url"]],build:v=>`${ymd(now())}\n\n【Radiko】\n\n⚠️無料プラン見逃し期限 ～${v.limit||"　"}まで\n\n${H}\n#Radiko\n\n${v.url||""}`},
+{id:"fc",title:"ジュニア情報局",fields:[["limit","視聴期限","text"],["url","URL","url"]],build:v=>`${ymd(now())}\n\n【ジュニア情報局】\n\n⚠️視聴期限　～${v.limit||"　"}まで\n\n${H}\n#ジュニア情報局\n\n${v.url||""}`},
+{id:"hashtags",title:"ハッシュタグ",fields:[],build:v=>H},
+{id:"tomorrow1",title:"翌日の予定①",fields:[["plan","予定内容","textarea"]],build:v=>`📢${tomorrow()}\n\n・${v.plan||"ブログ更新予定日"}\n\n${H}`},
+{id:"tomorrow2",title:"翌日の予定②",fields:[["plan","予定内容","textarea"]],build:v=>`📢${tomorrow()}\n\n・${v.plan||""}\n\n${H}`},
+{id:"youtube",title:"百鬼夜鏡 YouTube再生数",fields:[
+ ["views","再生数","text"],["viewsPlus","再生数 前日比","text"],["likes","高評価","text"],["likesPlus","高評価 前日比","text"],
+ ["goal","月内目標再生数","text"],["remain","あと○回","text"],["perday","1日あたり○回","text"]
+],fixedUrl:"https://youtu.be/DlvTFxY9g_o?si=eTr_Hb-vOpIk8e2E",
+build:v=>`【Youtube】\n\n${md(now())} 24:00　　${v.views||"●●●"}回 　 ＋${v.viewsPlus||"●"}\n\n高評価 ${v.likes||"●●"} +${v.likesPlus||"●"}\n\n月内${v.goal||"●●"}回再生目指しましょう！\n\nあと${v.remain||"●●"}(1日あたり${v.perday||"●●"})\n\n再生数1位継続しましょう！\n\nお疲れ様でした👏\n\n明日も頑張りましょう💪\n\n#元木湧\n#ジュニア\n#百鬼夜鏡\n\n${v.url||""}`},
+{id:"nextweek",title:"翌週の予定",fields:[["plan","予定内容","textarea"]],build:v=>`📢${nextWeek()}\n\n・${v.plan||"ブログ更新予定日(月)(水)(金)"}\n\n${H}`},
+{id:"monthly",title:"活動まとめ",fields:[
+ ["stage","ステージ","text"],["info","情報局","text"],["blogPosts","ブログ 投稿回数","text"],["blogPhotos","ブログ 写真回数","text"],
+ ["instagram","Instagram投稿","text"],["stories","Instagramストーリーズ回数","text"],["tiktok","TikTok","text"],["youtube","YouTube","text"],
+ ["magazine","Magazine","text"],["radio","Radio","text"],["tv","TV","text"]
+],build:v=>`${monthRange()}\n\n【活動まとめ】\n\n#元木湧 くん1ヶ月お疲れ様でした☆.*゜\n\n*ステージ→${v.stage||""}\n\n*情報局→${v.info||""}\n\n*元木湧のブログ→投稿 ${v.blogPosts||"〇"}回 写真 ${v.blogPhotos||"〇"}回(日付画像参照)\n\n*Instagram投稿→${v.instagram||""}\n\n*Instagramストーリーズ→${v.stories||"〇"}回(日付画像参照)\n\n*Tiktok→${v.tiktok||""}\n\n*Youtube→${v.youtube||""}\n\n*Magazine→${v.magazine||""}\n\n*Radio→${v.radio||""}\n\n*TV→${v.tv||""}\n\n#ジュニア`},
+{id:"openchat",title:"おぷちゃ共有用",noX:true,fields:[
+ ["views","元木くん 再生数","text"],["viewsPlus","昨日からの増加数","text"],["likes","元木くん 高評価","text"],["likesPlus","高評価 増加数","text"],
+ ["kviews","川﨑さん 再生数","text"],["kviewsPlus","川﨑さん 増加数","text"],["klikes","川﨑さん 高評価","text"],["klikesPlus","川﨑さん 高評価増加数","text"]
+],build:v=>`今日も再生お疲れ様でした！\n${v.views||"●●"}回再生です👏\n昨日＋${v.viewsPlus||"●●"}\n高評価${v.likes||"●●"}　＋${v.likesPlus||"●●"}\n\n参考⬇️\n川﨑さん　${v.kviews||"●●"}回　＋${v.kviewsPlus||"●●"}\n高評価　${v.klikes||"●●"}＋${v.klikesPlus||"●●"}\n\n明日もわくとわく担がいい日になりますように♪`}
+];
+
+function vals(t){
+ const o={}; t.fields.forEach(f=>{const el=document.querySelector(`#${t.id}-${f[0]}`);o[f[0]]=el?el.value.trim():""});
+ if(t.fixedUrl)o.url=t.fixedUrl; return o;
+}
+function update(t){document.querySelector(`#p-${t.id}`).textContent=t.build(vals(t))}
+function copyText(t){
+ navigator.clipboard.writeText(t.build(vals(t))).then(()=>{const b=document.querySelector(`#c-${t.id}`);const old=b.textContent;b.textContent="コピーしました ✓";setTimeout(()=>b.textContent=old,1200)})
+}
+function clearFields(t){t.fields.forEach(f=>document.querySelector(`#${t.id}-${f[0]}`).value="");update(t)}
+function postX(t){const text=t.build(vals(t));window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,"_blank")}
+function fieldHTML(t,f){
+ const [key,label,type]=f,id=`${t.id}-${key}`;
+ if(type==="textarea") return `<div class="wide"><label for="${id}">${label}</label><textarea id="${id}" placeholder="${label}を入力"></textarea></div>`;
+ return `<div><label for="${id}">${label}</label><input id="${id}" type="${type==="url"?"url":"text"}" placeholder="${label}を入力"></div>`;
+}
+const nav=document.querySelector("#nav"),cards=document.querySelector("#cards");
+templates.forEach(t=>{
+ nav.insertAdjacentHTML("beforeend",`<a href="#${t.id}">${t.title}</a>`);
+ cards.insertAdjacentHTML("beforeend",`<section class="card" id="${t.id}"><h2>${t.title}</h2>
+ <div class="grid">${t.fields.map(f=>fieldHTML(t,f)).join("")}</div>
+ ${t.fixedUrl?`<p class="note">YouTube URLはテンプレートに固定済みです。</p>`:""}
+ <div class="preview" id="p-${t.id}"></div>
+ <div class="actions">${t.noX?"":`<button class="xbtn" id="x-${t.id}">Xで投稿</button>`}
+ <button class="copy" id="c-${t.id}">全文コピー</button><button class="clear" id="d-${t.id}">入力内容を消す</button></div></section>`);
+ t.fields.forEach(f=>document.querySelector(`#${t.id}-${f[0]}`).addEventListener("input",()=>update(t)));
+ document.querySelector(`#c-${t.id}`).onclick=()=>copyText(t);
+ document.querySelector(`#d-${t.id}`).onclick=()=>clearFields(t);
+ if(!t.noX)document.querySelector(`#x-${t.id}`).onclick=()=>postX(t);
+ update(t);
+});
+</script>
+</body></html>
