@@ -36,7 +36,16 @@
   <p class="sub">必要な項目を入力 → 完成文を確認 → Xで投稿 / コピー</p>
   <nav class="nav" id="nav"></nav>
 </div></header>
-<main class="wrap"><div id="cards"></div><footer>スマホ向けテンプレートツール</footer></main>
+<main class="wrap">
+  <div id="cards"></div>
+  <div style="margin-top:24px">
+    <button type="button" onclick="window.scrollTo({top:0,behavior:'smooth'})"
+      style="width:100%;background:#d90020;color:#fff;border:none;border-radius:12px;min-height:50px;font-weight:700;font-size:15px;cursor:pointer">
+      ↑ トップに戻る
+    </button>
+  </div>
+  <footer>スマホ向けテンプレートツール</footer>
+</main>
 <script>
 const pad=n=>String(n).padStart(2,"0");
 const now=()=>new Date();
