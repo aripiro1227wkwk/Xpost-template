@@ -9,15 +9,10 @@
   <title>X投稿テンプレート</title>
 
   <script>
-    /* ブラウザのスクロール位置復元を停止 */
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }
 
-    /*
-      URLに #tiktok などが残っていた場合、
-      HTMLを表示する前に #部分を消す
-    */
     if (location.hash) {
       history.replaceState(
         null,
@@ -26,7 +21,6 @@
       );
     }
 
-    /* 最初にトップへ */
     window.scrollTo(0, 0);
   </script>
 
@@ -227,7 +221,6 @@
     }
 
     @media(max-width:430px) {
-
       h1 {
         font-size:24px;
       }
@@ -259,29 +252,20 @@
 
 <body>
 
-<!-- 強制トップ移動用 -->
 <div id="page-top"></div>
 
 <header>
+  <div class="wrap" style="padding-bottom:0">
 
-  <div class="wrap"
-       style="padding-bottom:0">
-
-    <h1>
-      X 投稿テンプレート
-    </h1>
+    <h1>X 投稿テンプレート</h1>
 
     <p class="sub">
       必要な項目を入力 → 完成文を確認 → Xで投稿 / コピー
     </p>
 
-    <nav
-      class="nav"
-      id="nav">
-    </nav>
+    <nav class="nav" id="nav"></nav>
 
   </div>
-
 </header>
 
 
@@ -293,9 +277,7 @@
     type="button"
     class="top-button"
     onclick="goTop()">
-
     ↑ トップに戻る
-
   </button>
 
   <footer>
@@ -308,183 +290,96 @@
 <script>
 
 /* =========================
-   トップ表示処理
+   トップ表示
    ========================= */
 
 function goTop() {
-
   window.scrollTo({
     top:0,
     left:0,
     behavior:"smooth"
   });
-
 }
-
-
-/*
- Safari / Chromeなどが
- 読み込み後に前回位置を復元する場合への対策
-*/
 
 function forceTop() {
-
-  window.scrollTo(
-    0,
-    0
-  );
-
+  window.scrollTo(0,0);
 }
 
+window.addEventListener("DOMContentLoaded", () => {
+  forceTop();
 
-window.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
+  requestAnimationFrame(() => {
     forceTop();
+    requestAnimationFrame(forceTop);
+  });
+});
 
-    requestAnimationFrame(
-      () => {
+window.addEventListener("load", () => {
+  forceTop();
 
-        forceTop();
+  setTimeout(forceTop,0);
+  setTimeout(forceTop,50);
+  setTimeout(forceTop,150);
+  setTimeout(forceTop,400);
+});
 
-        requestAnimationFrame(
-          forceTop
-        );
+window.addEventListener("pageshow", () => {
 
-      }
+  if (location.hash) {
+    history.replaceState(
+      null,
+      "",
+      location.pathname + location.search
     );
-
   }
-);
 
+  forceTop();
 
-window.addEventListener(
-  "load",
-  () => {
-
-    forceTop();
-
-    setTimeout(
-      forceTop,
-      0
-    );
-
-    setTimeout(
-      forceTop,
-      50
-    );
-
-    setTimeout(
-      forceTop,
-      150
-    );
-
-    setTimeout(
-      forceTop,
-      400
-    );
-
-  }
-);
-
-
-window.addEventListener(
-  "pageshow",
-  () => {
-
-    if (location.hash) {
-
-      history.replaceState(
-        null,
-        "",
-        location.pathname +
-        location.search
-      );
-
-    }
-
-    forceTop();
-
-    setTimeout(
-      forceTop,
-      50
-    );
-
-    setTimeout(
-      forceTop,
-      250
-    );
-
-  }
-);
+  setTimeout(forceTop,50);
+  setTimeout(forceTop,250);
+});
 
 
 /* =========================
-   日付
+   日付・時刻
    ========================= */
 
-const pad =
-  n =>
-    String(n)
-      .padStart(
-        2,
-        "0"
-      );
+const pad = n =>
+  String(n).padStart(2,"0");
 
+const now = () =>
+  new Date();
 
-const now =
-  () =>
-    new Date();
-
-
-const ymd =
-  (d,slashPad=true) =>
-
-    slashPad
-
+const ymd = (d,slashPad=true) =>
+  slashPad
     ? `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())}`
-
     : `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
 
-
-const md =
-  d =>
-    `${d.getMonth()+1}/${d.getDate()}`;
+const md = d =>
+  `${d.getMonth()+1}/${d.getDate()}`;
 
 
-const addDays =
-  (d,n) => {
-
-    const x =
-      new Date(d);
-
-    x.setDate(
-      x.getDate()+n
-    );
-
-    return x;
-
-  };
+/* ブログ用
+   16:00〜16:59 → 16:00
+   17:00〜17:59 → 17:00
+*/
+const hourTime = d =>
+  `${d.getHours()}:00`;
 
 
-const tomorrow =
-  () =>
-    ymd(
-      addDays(
-        now(),
-        1
-      )
-    );
+const addDays = (d,n) => {
+  const x = new Date(d);
+  x.setDate(x.getDate()+n);
+  return x;
+};
 
+const tomorrow = () =>
+  ymd(addDays(now(),1));
 
 function nextWeek() {
 
-  const d =
-    now();
-
-  const day =
-    d.getDay();
+  const d = now();
+  const day = d.getDay();
 
   const daysToMon =
     day === 0
@@ -492,26 +387,17 @@ function nextWeek() {
       : 8-day;
 
   const mon =
-    addDays(
-      d,
-      daysToMon
-    );
+    addDays(d,daysToMon);
 
   const sun =
-    addDays(
-      mon,
-      6
-    );
+    addDays(mon,6);
 
   return `${ymd(mon,false)}～${ymd(sun,false)}`;
-
 }
-
 
 function monthRange() {
 
-  const d =
-    now();
+  const d = now();
 
   const last =
     new Date(
@@ -521,14 +407,11 @@ function monthRange() {
     );
 
   return `${d.getFullYear()}/${d.getMonth()+1}/1～${d.getFullYear()}/${d.getMonth()+1}/${last.getDate()}`;
-
 }
-
 
 const H =
 `#元木湧
 #ジュニア`;
-
 
 
 /* =========================
@@ -536,7 +419,6 @@ const H =
    ========================= */
 
 const templates = [
-
 
 /* Instagram */
 
@@ -561,6 +443,25 @@ ${v.url||""}`
 },
 
 
+/* Instagram ストーリー */
+
+{
+  id:"instagramstories",
+  title:"Instagram ストーリー",
+
+  fields:[],
+
+  build:v=>
+`${ymd(now())}
+
+【Instagram stories】
+ジュニア公式
+
+
+#元木湧
+#ジュニア`
+},
+
 
 /* ブログ */
 
@@ -574,7 +475,7 @@ ${v.url||""}`
   ],
 
   build:v=>
-`${ymd(now())}
+`${ymd(now())} ${hourTime(now())}
 
 【FAMILY CLUB web】
 
@@ -586,7 +487,6 @@ ${v.url||""}`
 
 ${v.url||""}`
 },
-
 
 
 /* TikTok */
@@ -610,7 +510,6 @@ ${H}
 
 ${v.url||""}`
 },
-
 
 
 /* TVer */
@@ -638,7 +537,6 @@ ${v.url||""}`
 },
 
 
-
 /* Radiko */
 
 {
@@ -664,8 +562,7 @@ ${v.url||""}`
 },
 
 
-
-/* FC */
+/* ジュニア情報局 */
 
 {
   id:"fc",
@@ -690,7 +587,6 @@ ${v.url||""}`
 },
 
 
-
 /* ハッシュタグ */
 
 {
@@ -699,13 +595,11 @@ ${v.url||""}`
 
   fields:[],
 
-  build:v=>
-    H
+  build:v=>H
 },
 
 
-
-/* 翌日① */
+/* 翌日の予定① */
 
 {
   id:"tomorrow1",
@@ -724,8 +618,7 @@ ${H}`
 },
 
 
-
-/* 翌日② */
+/* 翌日の予定② */
 
 {
   id:"tomorrow2",
@@ -744,8 +637,7 @@ ${H}`
 },
 
 
-
-/* プレミアム */
+/* プレミアム用 */
 
 {
   id:"premiumlist",
@@ -766,7 +658,6 @@ https://youtube-playlist-links.vercel.app/premium?xcard=3
 #百鬼夜鏡
 #元木湧リスト`
 },
-
 
 
 /* 全員用 */
@@ -792,7 +683,6 @@ https://youtube-playlist-links.vercel.app/all?xcard=2
 },
 
 
-
 /* YouTube再生数 */
 
 {
@@ -800,49 +690,13 @@ https://youtube-playlist-links.vercel.app/all?xcard=2
   title:"百鬼夜鏡 YouTube再生数",
 
   fields:[
-
-    [
-      "views",
-      "再生数",
-      "text"
-    ],
-
-    [
-      "viewsPlus",
-      "再生数 前日比",
-      "text"
-    ],
-
-    [
-      "likes",
-      "高評価",
-      "text"
-    ],
-
-    [
-      "likesPlus",
-      "高評価 前日比",
-      "text"
-    ],
-
-    [
-      "goal",
-      "月内目標再生数",
-      "text"
-    ],
-
-    [
-      "remain",
-      "あと○回",
-      "text"
-    ],
-
-    [
-      "perday",
-      "1日あたり○回",
-      "text"
-    ]
-
+    ["views","再生数","text"],
+    ["viewsPlus","再生数 前日比","text"],
+    ["likes","高評価","text"],
+    ["likesPlus","高評価 前日比","text"],
+    ["goal","月内目標再生数","text"],
+    ["remain","あと○回","text"],
+    ["perday","1日あたり○回","text"]
   ],
 
   fixedUrl:
@@ -873,8 +727,7 @@ ${v.url||""}`
 },
 
 
-
-/* 翌週 */
+/* 翌週の予定 */
 
 {
   id:"nextweek",
@@ -893,7 +746,6 @@ ${H}`
 },
 
 
-
 /* 活動まとめ */
 
 {
@@ -901,73 +753,17 @@ ${H}`
   title:"活動まとめ",
 
   fields:[
-
-    [
-      "stage",
-      "ステージ",
-      "text"
-    ],
-
-    [
-      "info",
-      "情報局",
-      "text"
-    ],
-
-    [
-      "blogPosts",
-      "ブログ 投稿回数",
-      "text"
-    ],
-
-    [
-      "blogPhotos",
-      "ブログ 写真回数",
-      "text"
-    ],
-
-    [
-      "instagram",
-      "Instagram投稿",
-      "text"
-    ],
-
-    [
-      "stories",
-      "Instagramストーリーズ回数",
-      "text"
-    ],
-
-    [
-      "tiktok",
-      "TikTok",
-      "text"
-    ],
-
-    [
-      "youtube",
-      "YouTube",
-      "text"
-    ],
-
-    [
-      "magazine",
-      "Magazine",
-      "text"
-    ],
-
-    [
-      "radio",
-      "Radio",
-      "text"
-    ],
-
-    [
-      "tv",
-      "TV",
-      "text"
-    ]
-
+    ["stage","ステージ","text"],
+    ["info","情報局","text"],
+    ["blogPosts","ブログ 投稿回数","text"],
+    ["blogPhotos","ブログ 写真回数","text"],
+    ["instagram","Instagram投稿","text"],
+    ["stories","Instagramストーリーズ回数","text"],
+    ["tiktok","TikTok","text"],
+    ["youtube","YouTube","text"],
+    ["magazine","Magazine","text"],
+    ["radio","Radio","text"],
+    ["tv","TV","text"]
   ],
 
   build:v=>
@@ -1001,8 +797,7 @@ ${H}`
 },
 
 
-
-/* おぷちゃ */
+/* おぷちゃ共有用 */
 
 {
   id:"openchat",
@@ -1011,55 +806,14 @@ ${H}`
   noX:true,
 
   fields:[
-
-    [
-      "views",
-      "元木くん 再生数",
-      "text"
-    ],
-
-    [
-      "viewsPlus",
-      "昨日からの増加数",
-      "text"
-    ],
-
-    [
-      "likes",
-      "元木くん 高評価",
-      "text"
-    ],
-
-    [
-      "likesPlus",
-      "高評価 増加数",
-      "text"
-    ],
-
-    [
-      "kviews",
-      "川﨑さん 再生数",
-      "text"
-    ],
-
-    [
-      "kviewsPlus",
-      "川﨑さん 増加数",
-      "text"
-    ],
-
-    [
-      "klikes",
-      "川﨑さん 高評価",
-      "text"
-    ],
-
-    [
-      "klikesPlus",
-      "川﨑さん 高評価増加数",
-      "text"
-    ]
-
+    ["views","元木くん 再生数","text"],
+    ["viewsPlus","昨日からの増加数","text"],
+    ["likes","元木くん 高評価","text"],
+    ["likesPlus","高評価 増加数","text"],
+    ["kviews","川﨑さん 再生数","text"],
+    ["kviewsPlus","川﨑さん 増加数","text"],
+    ["klikes","川﨑さん 高評価","text"],
+    ["klikesPlus","川﨑さん 高評価増加数","text"]
   ],
 
   build:v=>
@@ -1078,7 +832,6 @@ ${v.views||"●●"}回再生です👏
 ];
 
 
-
 /* =========================
    入力値取得
    ========================= */
@@ -1087,127 +840,108 @@ function vals(t) {
 
   const o = {};
 
-  t.fields.forEach(
-    f => {
+  t.fields.forEach(f => {
 
-      const el =
-        document.querySelector(
-          `#${t.id}-${f[0]}`
-        );
+    const el =
+      document.querySelector(
+        `#${t.id}-${f[0]}`
+      );
 
-      o[f[0]] =
-        el
-          ? el.value.trim()
-          : "";
-
-    }
-  );
+    o[f[0]] =
+      el
+        ? el.value.trim()
+        : "";
+  });
 
   if(t.fixedUrl) {
-
-    o.url =
-      t.fixedUrl;
-
+    o.url = t.fixedUrl;
   }
 
   return o;
-
 }
 
 
-
-/* プレビュー */
+/* =========================
+   プレビュー更新
+   ========================= */
 
 function update(t) {
 
   document.querySelector(
     `#p-${t.id}`
   ).textContent =
-    t.build(
-      vals(t)
-    );
-
+    t.build(vals(t));
 }
 
 
-
-/* コピー */
+/* =========================
+   コピー
+   ========================= */
 
 function copyText(t) {
 
   const text =
-    t.build(
-      vals(t)
-    );
+    t.build(vals(t));
 
   navigator.clipboard
     .writeText(text)
-    .then(
-      () => {
+    .then(() => {
 
-        const b =
-          document.querySelector(
-            `#c-${t.id}`
-          );
-
-        const old =
-          b.textContent;
-
-        b.textContent =
-          "コピーしました ✓";
-
-        setTimeout(
-          () =>
-            b.textContent=old,
-          1200
+      const b =
+        document.querySelector(
+          `#c-${t.id}`
         );
 
-      }
-    );
+      const old =
+        b.textContent;
 
+      b.textContent =
+        "コピーしました ✓";
+
+      setTimeout(
+        () => b.textContent=old,
+        1200
+      );
+    });
 }
 
 
-
-/* 入力消去 */
+/* =========================
+   入力消去
+   ========================= */
 
 function clearFields(t) {
 
-  t.fields.forEach(
-    f => {
+  t.fields.forEach(f => {
 
-      document.querySelector(
-        `#${t.id}-${f[0]}`
-      ).value="";
-
-    }
-  );
+    document.querySelector(
+      `#${t.id}-${f[0]}`
+    ).value="";
+  });
 
   update(t);
-
 }
 
 
-
-/* X */
+/* =========================
+   X投稿
+   ========================= */
 
 function postX(t) {
 
   const text =
-    t.build(
-      vals(t)
-    );
+    t.build(vals(t));
 
   window.open(
     `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`,
     "_blank"
   );
-
 }
 
 
-
-/* 入力欄 */
+/* =========================
+   入力欄
+   ========================= */
 
 function fieldHTML(t,f) {
 
@@ -1219,7 +953,6 @@ function fieldHTML(t,f) {
 
   const id =
     `${t.id}-${key}`;
-
 
   if(type==="textarea") {
 
@@ -1236,9 +969,7 @@ function fieldHTML(t,f) {
 
       </div>
     `;
-
   }
-
 
   return `
     <div>
@@ -1254,9 +985,7 @@ function fieldHTML(t,f) {
 
     </div>
   `;
-
 }
-
 
 
 /* =========================
@@ -1264,198 +993,143 @@ function fieldHTML(t,f) {
    ========================= */
 
 const nav =
-  document.querySelector(
-    "#nav"
-  );
+  document.querySelector("#nav");
 
 const cards =
-  document.querySelector(
-    "#cards"
+  document.querySelector("#cards");
+
+
+templates.forEach(t => {
+
+  nav.insertAdjacentHTML(
+    "beforeend",
+
+    `<a href="#${t.id}">
+      ${t.title}
+    </a>`
   );
 
 
-templates.forEach(
-  t => {
+  cards.insertAdjacentHTML(
+    "beforeend",
 
+    `<section
+       class="card"
+       id="${t.id}">
 
-    /* 上部ボタン */
-
-    nav.insertAdjacentHTML(
-      "beforeend",
-
-      `<a href="#${t.id}">
+      <h2>
         ${t.title}
-      </a>`
-    );
+      </h2>
 
-
-
-    /* カード */
-
-    cards.insertAdjacentHTML(
-      "beforeend",
-
-      `<section
-         class="card"
-         id="${t.id}">
-
-        <h2>
-          ${t.title}
-        </h2>
-
-
-        <div class="grid">
-
-          ${
-            t.fields
-              .map(
-                f =>
-                  fieldHTML(
-                    t,
-                    f
-                  )
-              )
-              .join("")
-          }
-
-        </div>
-
+      <div class="grid">
 
         ${
-          t.fixedUrl
-            ?
-            `<p class="note">
-              YouTube URLはテンプレートに固定済みです。
-            </p>`
-            :
-            ""
+          t.fields
+            .map(f => fieldHTML(t,f))
+            .join("")
         }
 
+      </div>
 
-        <div
-          class="preview"
-          id="p-${t.id}">
-        </div>
-
-
-        <div class="actions">
-
-          ${
-            t.noX
-              ?
-              ""
-              :
-              `<button
-                 class="xbtn"
-                 id="x-${t.id}">
-                 Xで投稿
-               </button>`
-          }
-
-
-          <button
-            class="copy"
-            id="c-${t.id}">
-            全文コピー
-          </button>
-
-
-          <button
-            class="clear"
-            id="d-${t.id}">
-            入力内容を消す
-          </button>
-
-        </div>
-
-      </section>`
-    );
-
-
-
-    /* 入力 */
-
-    t.fields.forEach(
-      f => {
-
-        document
-          .querySelector(
-            `#${t.id}-${f[0]}`
-          )
-          .addEventListener(
-            "input",
-            () =>
-              update(t)
-          );
-
+      ${
+        t.fixedUrl
+          ?
+          `<p class="note">
+            YouTube URLはテンプレートに固定済みです。
+          </p>`
+          :
+          ""
       }
-    );
+
+      <div
+        class="preview"
+        id="p-${t.id}">
+      </div>
+
+      <div class="actions">
+
+        ${
+          t.noX
+            ?
+            ""
+            :
+            `<button
+               class="xbtn"
+               id="x-${t.id}">
+               Xで投稿
+             </button>`
+        }
+
+        <button
+          class="copy"
+          id="c-${t.id}">
+          全文コピー
+        </button>
+
+        <button
+          class="clear"
+          id="d-${t.id}">
+          入力内容を消す
+        </button>
+
+      </div>
+
+    </section>`
+  );
 
 
-
-    /* コピー */
+  t.fields.forEach(f => {
 
     document
       .querySelector(
-        `#c-${t.id}`
+        `#${t.id}-${f[0]}`
       )
-      .onclick =
-        () =>
-          copyText(t);
+      .addEventListener(
+        "input",
+        () => update(t)
+      );
+  });
 
 
+  document
+    .querySelector(
+      `#c-${t.id}`
+    )
+    .onclick =
+      () => copyText(t);
 
-    /* 消去 */
+
+  document
+    .querySelector(
+      `#d-${t.id}`
+    )
+    .onclick =
+      () => clearFields(t);
+
+
+  if(!t.noX) {
 
     document
       .querySelector(
-        `#d-${t.id}`
+        `#x-${t.id}`
       )
       .onclick =
-        () =>
-          clearFields(t);
-
-
-
-    /* X */
-
-    if(!t.noX) {
-
-      document
-        .querySelector(
-          `#x-${t.id}`
-        )
-        .onclick =
-          () =>
-            postX(t);
-
-    }
-
-
-    update(t);
-
+        () => postX(t);
   }
-);
 
 
-/*
- テンプレート生成でページの高さが変わった後にも
- 念のためトップへ戻す
-*/
+  update(t);
+});
+
+
+/* 最後にもトップへ */
 
 forceTop();
 
-requestAnimationFrame(
-  () => {
-
-    forceTop();
-
-    requestAnimationFrame(
-      forceTop
-    );
-
-  }
-);
+requestAnimationFrame(() => {
+  forceTop();
+  requestAnimationFrame(forceTop);
+});
 
 </script>
 
