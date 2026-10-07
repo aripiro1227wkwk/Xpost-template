@@ -358,26 +358,37 @@ const ymd = (d,slashPad=true) =>
 const md = d =>
   `${d.getMonth()+1}/${d.getDate()}`;
 
-
-/* ブログ用：現在の時間を○:00で表示 */
 const hourTime = d =>
   `${d.getHours()}:00`;
 
-
-/* TikTok再生回数共有用
-   0:00〜2:59   → 0:00
-   3:00〜5:59   → 3:00
-   6:00〜8:59   → 6:00
-   9:00〜11:59  → 9:00
-   12:00〜14:59 → 12:00
-   15:00〜17:59 → 15:00
-   18:00〜20:59 → 18:00
-   21:00〜23:59 → 21:00
-*/
 const threeHourTime = d => {
   const h = Math.floor(d.getHours() / 3) * 3;
   return `${h}:00`;
 };
+
+
+/* =========================
+   数字を3桁区切りにする
+   10000 → 10,000
+   ========================= */
+
+function comma(value) {
+
+  if (!value) {
+    return "";
+  }
+
+  const cleaned =
+    String(value)
+      .replace(/,/g,"")
+      .trim();
+
+  if (!/^-?\d+$/.test(cleaned)) {
+    return value;
+  }
+
+  return Number(cleaned).toLocaleString("ja-JP");
+}
 
 
 const addDays = (d,n) => {
@@ -525,7 +536,7 @@ ${v.url||""}`
 },
 
 
-/* ★追加① 百鬼夜鏡ハッシュタグ */
+/* 百鬼夜鏡ハッシュタグ */
 
 {
   id:"hyakkihashtags",
@@ -545,7 +556,7 @@ ${v.url||""}`
 },
 
 
-/* ★追加② TikTok URL共有 */
+/* TikTok URL共有 */
 
 {
   id:"tiktokshare",
@@ -583,29 +594,40 @@ ${v.url||""}`
 },
 
 
-/* ★追加③ TikTok再生回数共有 */
+/* TikTok再生回数共有 */
 
 {
   id:"tiktokcount",
   title:"TikTok再生回数共有",
 
   fields:[
-    ["views","再生数","text"],
-    ["likes","いいね","text"],
-    ["comments","コメント","text"],
-    ["shares","シェア","text"],
-    ["saves","保存","text"],
+    ["views","再生数","numbercomma"],
+    ["likes","いいね","numbercomma"],
+    ["comments","コメント","numbercomma"],
+    ["shares","シェア","numbercomma"],
+    ["saves","保存","numbercomma"],
     ["url","URL","url"]
   ],
 
   build:v=>
-`${ymd(now(),false)} ${threeHourTime(now())}
+`▶️Tiktok再生数 共有
+　
+${ymd(now(),false)} ${threeHourTime(now())}
 
-再生数${v.views||"●●"}
-いいね${v.likes||"●●"}
-コメント${v.comments||"●●"}
-シェア${v.shares||"●●"}
-保存${v.saves||"●●"}
+再生数${comma(v.views)||"●●"}
+いいね${comma(v.likes)||"●●"}
+コメント${comma(v.comments)||"●●"}
+シェア${comma(v.shares)||"●●"}
+保存${comma(v.saves)||"●●"}
+
+#元木湧
+#ジュニア
+#百鬼夜鏡
+#川﨑皇輝
+#内村颯太
+#安嶋秀生
+#北川拓実
+#松尾龍
 
 引き続き再生お願いします♪
 
@@ -791,13 +813,13 @@ https://youtube-playlist-links.vercel.app/all?xcard=2
   title:"百鬼夜鏡 YouTube再生数",
 
   fields:[
-    ["views","再生数","text"],
-    ["viewsPlus","再生数 前日比","text"],
-    ["likes","高評価","text"],
-    ["likesPlus","高評価 前日比","text"],
-    ["goal","月内目標再生数","text"],
-    ["remain","あと○回","text"],
-    ["perday","1日あたり○回","text"]
+    ["views","再生数","numbercomma"],
+    ["viewsPlus","再生数 前日比","numbercomma"],
+    ["likes","高評価","numbercomma"],
+    ["likesPlus","高評価 前日比","numbercomma"],
+    ["goal","月内目標再生数","numbercomma"],
+    ["remain","あと○回","numbercomma"],
+    ["perday","1日あたり○回","numbercomma"]
   ],
 
   fixedUrl:
@@ -806,13 +828,13 @@ https://youtube-playlist-links.vercel.app/all?xcard=2
   build:v=>
 `【Youtube】
 
-${md(now())} 24:00　　${v.views||"●●●"}回 　 ＋${v.viewsPlus||"●"}
+${md(now())} 24:00　　${comma(v.views)||"●●●"}回 　 ＋${comma(v.viewsPlus)||"●"}
 
-高評価 ${v.likes||"●●"} +${v.likesPlus||"●"}
+高評価 ${comma(v.likes)||"●●"} +${comma(v.likesPlus)||"●"}
 
-月内${v.goal||"●●"}回再生目指しましょう！
+月内${comma(v.goal)||"●●"}回再生目指しましょう！
 
-あと${v.remain||"●●"}(1日あたり${v.perday||"●●"})
+あと${comma(v.remain)||"●●"}(1日あたり${comma(v.perday)||"●●"})
 
 再生数1位継続しましょう！
 
@@ -907,25 +929,25 @@ ${H}`
   noX:true,
 
   fields:[
-    ["views","元木くん 再生数","text"],
-    ["viewsPlus","昨日からの増加数","text"],
-    ["likes","元木くん 高評価","text"],
-    ["likesPlus","高評価 増加数","text"],
-    ["kviews","川﨑さん 再生数","text"],
-    ["kviewsPlus","川﨑さん 増加数","text"],
-    ["klikes","川﨑さん 高評価","text"],
-    ["klikesPlus","川﨑さん 高評価増加数","text"]
+    ["views","元木くん 再生数","numbercomma"],
+    ["viewsPlus","昨日からの増加数","numbercomma"],
+    ["likes","元木くん 高評価","numbercomma"],
+    ["likesPlus","高評価 増加数","numbercomma"],
+    ["kviews","川﨑さん 再生数","numbercomma"],
+    ["kviewsPlus","川﨑さん 増加数","numbercomma"],
+    ["klikes","川﨑さん 高評価","numbercomma"],
+    ["klikesPlus","川﨑さん 高評価増加数","numbercomma"]
   ],
 
   build:v=>
 `今日も再生お疲れ様でした！
-${v.views||"●●"}回再生です👏
-昨日＋${v.viewsPlus||"●●"}
-高評価${v.likes||"●●"}　＋${v.likesPlus||"●●"}
+${comma(v.views)||"●●"}回再生です👏
+昨日＋${comma(v.viewsPlus)||"●●"}
+高評価${comma(v.likes)||"●●"}　＋${comma(v.likesPlus)||"●●"}
 
 参考⬇️
-川﨑さん　${v.kviews||"●●"}回　＋${v.kviewsPlus||"●●"}
-高評価　${v.klikes||"●●"}＋${v.klikesPlus||"●●"}
+川﨑さん　${comma(v.kviews)||"●●"}回　＋${comma(v.kviewsPlus)||"●●"}
+高評価　${comma(v.klikes)||"●●"}＋${comma(v.klikesPlus)||"●●"}
 
 明日もわくとわく担がいい日になりますように♪`
 }
@@ -1082,6 +1104,7 @@ function fieldHTML(t,f) {
       <input
         id="${id}"
         type="${type==="url" ? "url" : "text"}"
+        ${type==="numbercomma" ? 'inputmode="numeric"' : ""}
         placeholder="${label}を入力">
 
     </div>
@@ -1181,14 +1204,30 @@ templates.forEach(t => {
 
   t.fields.forEach(f => {
 
-    document
-      .querySelector(
+    const input =
+      document.querySelector(
         `#${t.id}-${f[0]}`
-      )
-      .addEventListener(
-        "input",
-        () => update(t)
       );
+
+    input.addEventListener(
+      "input",
+      () => update(t)
+    );
+
+    if (f[2] === "numbercomma") {
+
+      input.addEventListener(
+        "blur",
+        () => {
+
+          if (input.value.trim()) {
+            input.value = comma(input.value);
+          }
+
+          update(t);
+        }
+      );
+    }
   });
 
 
