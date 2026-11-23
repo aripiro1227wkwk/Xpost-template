@@ -536,6 +536,39 @@ ${v.url||""}`
 },
 
 
+/* ブログ掲載 */
+
+{
+  id:"blogfeature",
+  title:"【ブログ掲載】",
+
+  fields:[
+    ["name","お名前（2か所に反映・#不要）","text"],
+    ["url","URL","url"],
+    ["tag","最後のハッシュタグ（#不要・空欄可）","text"]
+  ],
+
+  build:v=> {
+    const d = now();
+    const name = v.name || "○○";
+    return `${ymd(d)} ${pad(d.getHours())}:00
+
+【FAMILY CLUB web】
+
+#${name} くん
+
+お名前・お写真掲載あり
+
+${v.url||""}
+
+#元木湧
+#ジュニア
+#${name} くん
+#${v.tag.replace(/^#/, "")}`;
+  }
+},
+
+
 /* TikTok */
 
 {
